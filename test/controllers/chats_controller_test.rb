@@ -1,38 +1,38 @@
 require "test_helper"
 
 class ChatsControllerTest < ActionDispatch::IntegrationTest
-  test "should get index" do
-    get chats_index_url
-    assert_response :success
+  setup do
+    @user = User.create!(email_address: "test@example.com", password: "password")
+    @chat = @user.chats.create!(model_id: "gpt-4", title: "Test Chat")
+    
+    # Simulate authentication by creating a session
+    @session = @user.sessions.create!(user_agent: "test", ip_address: "127.0.0.1")
+    # Login by posting to the sessions endpoint to set the proper cookie
+    post session_url, params: { email_address: @user.email_address, password: "password" }
   end
 
-  test "should get show" do
-    get chats_show_url
+  test "should get index" do
+    get chats_url
     assert_response :success
+    assert_select "h1", "Your Chats"
   end
 
   test "should get new" do
-    get chats_new_url
+    get new_chat_url
     assert_response :success
+    assert_select "h1", "Create New Chat"
   end
 
-  test "should get create" do
-    get chats_create_url
-    assert_response :success
+  test "should create chat" do
+    assert_difference("Chat.count") do
+      post chats_url, params: { chat: { model_id: "gpt-3.5-turbo", title: "New Test Chat" } }
+    end
+
+    assert_redirected_to chat_url(Chat.last)
   end
 
-  test "should get edit" do
-    get chats_edit_url
-    assert_response :success
-  end
-
-  test "should get update" do
-    get chats_update_url
-    assert_response :success
-  end
-
-  test "should get destroy" do
-    get chats_destroy_url
+  test "should show chat" do
+    get chat_url(@chat)
     assert_response :success
   end
 end

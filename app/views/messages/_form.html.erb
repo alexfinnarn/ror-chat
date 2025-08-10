@@ -1,0 +1,19 @@
+<div id="new_message_form">
+  <%= form_with(model: [@chat, @chat.messages.build], 
+                local: false,
+                class: "flex space-x-4",
+                data: { action: "submit->chat#submitForm" }) do |f| %>
+    <div class="flex-1">
+      <%= f.text_area :content, 
+                     placeholder: "Type your message here...",
+                     rows: 1,
+                     class: "w-full px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+                     data: { 
+                       controller: "auto-resize",
+                       action: "keydown->chat#handleKeydown" 
+                     } %>
+    </div>
+    <%= f.submit "Send", 
+                 class: "px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50" %>
+  <% end %>
+</div>

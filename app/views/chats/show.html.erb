@@ -1,10 +1,35 @@
 <%= turbo_stream_from [@chat, "messages"] %>
-<h1>Chat <%= @chat.id %></h1>
-<div id="messages" data-controller="message-ordering">
-  <%= render @chat.messages %>
+
+<div class="flex flex-col h-screen bg-gray-50" data-controller="chat">
+  <!-- Header -->
+  <div class="flex-none bg-white border-b border-gray-200 px-6 py-4">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-xl font-semibold text-gray-900">
+          <%= @chat.title || "Chat #{@chat.id}" %>
+        </h1>
+        <p class="text-sm text-gray-500">Model: <%= @chat.model_id %></p>
+      </div>
+      <div class="flex space-x-2">
+        <%= link_to "Edit", edit_chat_path(@chat), class: "px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors" %>
+        <%= link_to "Back to Chats", chats_path, class: "px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages Container -->
+  <div class="flex-1 overflow-y-auto" data-chat-target="messages">
+    <div id="messages" 
+         data-controller="message-ordering" 
+         class="max-w-4xl mx-auto px-4 py-6 space-y-6">
+      <%= render @chat.messages %>
+    </div>
+  </div>
+
+  <!-- Message Input Form -->
+  <div class="flex-none bg-white border-t border-gray-200 px-6 py-4">
+    <div class="max-w-4xl mx-auto">
+      <%= render 'messages/form' %>
+    </div>
+  </div>
 </div>
-<!-- Your form to submit new messages -->
-<%= form_with(url: chat_messages_path(@chat), method: :post) do |f| %>
-  <%= f.text_area :content %>
-  <%= f.submit "Send" %>
-<% end %>

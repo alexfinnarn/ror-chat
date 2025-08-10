@@ -1,2 +1,46 @@
-<h1>Chats#index</h1>
-<p>Find me in app/views/chats/index.html.erb</p>
+<div class="max-w-4xl mx-auto">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Your Chats</h1>
+    <%= link_to "New Chat", new_chat_path, class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors" %>
+  </div>
+
+  <% if @chats.any? %>
+    <div class="space-y-4">
+      <% @chats.each do |chat| %>
+        <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+          <%= link_to chat, class: "block" do %>
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                  <%= chat.title.present? ? chat.title : "Chat #{chat.id}" %>
+                </h3>
+                <p class="text-sm text-gray-600 mb-2">
+                  Model: <%= chat.model_id %>
+                </p>
+                <p class="text-xs text-gray-500">
+                  Last updated: <%= time_ago_in_words(chat.updated_at) %> ago
+                </p>
+              </div>
+              <div class="text-gray-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center py-12">
+      <div class="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+        <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No chats yet</h3>
+      <p class="text-gray-600 mb-6">Start your first conversation with an AI model</p>
+      <%= link_to "Create Your First Chat", new_chat_path, class: "bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" %>
+    </div>
+  <% end %>
+</div>
