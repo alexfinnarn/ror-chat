@@ -1,2 +1,10 @@
-<h1>Chats#show</h1>
-<p>Find me in app/views/chats/show.html.erb</p>
+<%= turbo_stream_from [@chat, "messages"] %>
+<h1>Chat <%= @chat.id %></h1>
+<div id="messages" data-controller="message-ordering">
+  <%= render @chat.messages %>
+</div>
+<!-- Your form to submit new messages -->
+<%= form_with(url: chat_messages_path(@chat), method: :post) do |f| %>
+  <%= f.text_area :content %>
+  <%= f.submit "Send" %>
+<% end %>
