@@ -49,6 +49,8 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  gem "dotenv-rails"
 end
 
 group :development do
@@ -63,7 +65,8 @@ group :test do
 end
 
 gem "ruby_llm"
+gem "redcarpet" # Markdown processor for AI message formatting
+gem "nokogiri" # HTML parsing for applying Tailwind classes
 
 gem "tailwindcss-ruby", "~> 4.1"
-
 gem "tailwindcss-rails", "~> 4.3"

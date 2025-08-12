@@ -44,5 +44,17 @@ export default class extends Controller {
         form.requestSubmit()
       }
     }
+    
+    // Debug: Add Ctrl+R to manually trigger message reordering
+    if (event.key === 'r' && event.ctrlKey) {
+      event.preventDefault()
+      const messageOrderingController = this.application.getControllerForElementAndIdentifier(
+        document.querySelector('[data-controller="message-ordering"]'),
+        'message-ordering'
+      )
+      if (messageOrderingController) {
+        messageOrderingController.manualReorder()
+      }
+    }
   }
 }

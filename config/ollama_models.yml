@@ -1,0 +1,35 @@
+---
+last_updated: '2025-08-12T12:09:37Z'
+api_endpoint: http://localhost:11434
+models_count: 6
+models:
+- id: gpt-oss:20b
+  name: gpt-oss:20b
+  display_name: Gpt-oss:20b (Ollama)
+  size: 13780173839
+  modified_at: '2025-08-05T20:39:25.225606387-04:00'
+- id: qwen3:14b
+  name: qwen3:14b
+  display_name: Qwen3:14b (Ollama)
+  size: 9276198565
+  modified_at: '2025-08-04T10:11:59.471433815-04:00'
+- id: gemma3:12b
+  name: gemma3:12b
+  display_name: Gemma3:12b (Ollama)
+  size: 8149190253
+  modified_at: '2025-08-04T09:47:34.373747137-04:00'
+- id: qwen3:8b
+  name: qwen3:8b
+  display_name: Qwen3:8b (Ollama)
+  size: 5225388164
+  modified_at: '2025-08-01T09:47:48.303766065-04:00'
+- id: deepseek-r1:8b
+  name: deepseek-r1:8b
+  display_name: Deepseek-r1:8b (Ollama)
+  size: 5225376047
+  modified_at: '2025-07-30T21:51:25.501060536-04:00'
+- id: llama3.2:latest
+  name: llama3.2:latest
+  display_name: Llama3.2:latest (Ollama)
+  size: 2019393189
+  modified_at: '2025-04-02T15:06:26.421491632-04:00'

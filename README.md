@@ -58,3 +58,7 @@ rails server
 ### Testing
 
 Testing needs to be set up using Rails best practices for testing.
+
+## More Documentation
+
+The `docs/` directory contains more documentation.

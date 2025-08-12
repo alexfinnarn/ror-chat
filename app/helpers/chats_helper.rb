@@ -6,7 +6,7 @@ module ChatsHelper
 
       # Define allowed providers from registry
       # allowed_providers = %w[openai anthropic gemini]
-      allowed_providers = []
+      allowed_providers = %w[anthropic]
 
       # Filter registry models to only include allowed providers
       filtered_models = registry_models.select { |model| allowed_providers.include?(model.provider) }
@@ -17,8 +17,8 @@ module ChatsHelper
         [display_name, model.id]
       end
 
-      # Get Ollama models from local API
-      ollama_options = fetch_ollama_models
+      # Get Ollama models from cached config
+      ollama_options = OllamaConfig.models_for_select
 
       # Combine registry and Ollama models
       all_options = registry_options + ollama_options
@@ -44,35 +44,6 @@ module ChatsHelper
 
   private
 
-  def fetch_ollama_models
-    require 'net/http'
-    require 'json'
-    
-    begin
-      uri = URI('http://localhost:11434/api/tags')
-      response = Net::HTTP.get_response(uri)
-      
-      if response.is_a?(Net::HTTPSuccess)
-        data = JSON.parse(response.body)
-        models = data['models'] || []
-        
-        # Format Ollama models
-        models.map do |model|
-          model_name = model['name']
-          display_name = "#{model_name.capitalize} (Ollama)"
-          [display_name, model_name]
-        end
-      else
-        Rails.logger.warn "Ollama API returned #{response.code}: #{response.message}"
-        []
-      end
-    rescue => e
-      Rails.logger.warn "Could not fetch Ollama models: #{e.message}"
-      # Return some common Ollama models as fallback
-      [
-        ['Llama 2 (Ollama)', 'llama2'],
-        ['Mistral (Ollama)', 'mistral']
-      ]
-    end
-  end
+  # Ollama models are now loaded from cached config via OllamaConfig
+  # Run 'rake ollama:refresh' to update the cached models
 end

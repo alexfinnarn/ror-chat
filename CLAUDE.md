@@ -43,6 +43,13 @@ bundle exec rubocop       # Ruby linting (omakase style)
 bundle exec brakeman     # Security scanning
 ```
 
+### Ollama Model Management
+```bash
+rake ollama:refresh       # Fetch and cache available Ollama models
+rake ollama:list         # List currently cached models
+rake ollama:status       # Show configuration status
+```
+
 ## Core Architecture
 
 ### Models

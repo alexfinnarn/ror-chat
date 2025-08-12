@@ -10,7 +10,7 @@
         <div class="flex justify-end">
           <div class="bg-blue-600 text-white px-4 py-2 rounded-lg max-w-xs md:max-w-md lg:max-w-lg">
             <div id="<%= dom_id(message, "content") %>">
-              <%= message.content.present? ? simple_format(message.content) : '<span class="thinking">...</span>'.html_safe %>
+              <%= message.content.present? ? markdown_to_html(message.content, dark_mode: true) : '<span class="thinking">...</span>'.html_safe %>
             </div>
           </div>
         </div>
@@ -22,7 +22,7 @@
           </div>
           <div class="flex-1 bg-white border border-gray-200 rounded-lg px-4 py-3 shadow-sm">
             <div id="<%= dom_id(message, "content") %>">
-              <%= message.content.present? ? simple_format(message.content) : '<span class="thinking text-gray-500">Thinking...</span>'.html_safe %>
+              <%= message.content.present? ? markdown_to_html(message.content, dark_mode: false) : '<span class="thinking text-gray-500">Thinking...</span>'.html_safe %>
             </div>
           </div>
         </div>

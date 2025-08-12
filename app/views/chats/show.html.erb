@@ -22,7 +22,7 @@
     <div id="messages" 
          data-controller="message-ordering" 
          class="max-w-4xl mx-auto px-4 py-6 space-y-6">
-      <%= render @chat.messages %>
+      <%= render @chat.messages.order(:created_at) %>
     </div>
   </div>
 

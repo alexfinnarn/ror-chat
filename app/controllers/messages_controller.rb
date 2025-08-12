@@ -17,7 +17,8 @@ class MessagesController < ApplicationController
     @message = @chat.messages.build(message_params.merge(role: "user"))
 
     if @message.save
-      # Create assistant response message
+      # Create assistant response message with a tiny delay to ensure proper timestamp ordering
+      sleep(0.001) # 1 millisecond delay to ensure later timestamp
       @assistant_message = @chat.messages.create!(role: "assistant", content: "")
 
       # Queue job to get AI response
