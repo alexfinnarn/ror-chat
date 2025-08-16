@@ -84,6 +84,25 @@ This project follows the Model Context Protocol specification for building MCP c
 
 The ruby_llm gem provides the core MCP client functionality through the `acts_as_chat` and `acts_as_message` mixins.
 
+### Available MCP Servers
+
+This project has two MCP servers that provide capabilities beyond built-in tools:
+
+#### Playwright Browser Automation (`mcp__my-playwright`)
+**Use for:** Web UI testing, browser automation, frontend validation
+- End-to-end testing of web interfaces
+- Screenshot capture for debugging UI issues
+- Automated interaction with web applications
+- **When to use:** Testing user workflows, debugging frontend issues, or validating web interfaces
+
+#### Context7 Documentation (`mcp__context7`)
+**Use for:** Retrieving up-to-date library documentation and examples
+- Get current API documentation for external libraries
+- Find code examples and best practices
+- Verify library compatibility and usage patterns
+- **When to use:** Working with external libraries, need current documentation, or implementing new integrations
+
+
 ## Artifact System
 
 This project includes a plugin-based artifact system in `lib/artifacts/` for handling special content types in LLM responses:
