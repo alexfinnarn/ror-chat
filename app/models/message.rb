@@ -1,7 +1,6 @@
 class Message < ApplicationRecord
   acts_as_message
 
-  has_many_attached :attachments
   include ActionView::RecordIdentifier
 
   # Note: Do NOT add "validates :content, presence: true"

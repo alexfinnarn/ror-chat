@@ -5,6 +5,31 @@ export default class extends Controller {
 
   connect() {
     this.scrollToBottom()
+    
+    // Listen for form submission events
+    this.element.addEventListener("turbo:submit-start", this.handleSubmitStart.bind(this))
+    this.element.addEventListener("turbo:submit-end", this.handleSubmitEnd.bind(this))
+  }
+
+  handleSubmitStart(event) {
+    // Optional: Show loading state or disable form
+    const form = event.target
+    const submitButton = form.querySelector('input[type="submit"], button[type="submit"]')
+    if (submitButton) {
+      submitButton.disabled = true
+      submitButton.dataset.originalText = submitButton.value || submitButton.textContent
+      submitButton.value = submitButton.textContent = "Sending..."
+    }
+  }
+
+  handleSubmitEnd(event) {
+    // Re-enable form after submission
+    const form = event.target
+    const submitButton = form.querySelector('input[type="submit"], button[type="submit"]')
+    if (submitButton) {
+      submitButton.disabled = false
+      submitButton.value = submitButton.textContent = submitButton.dataset.originalText || "Send"
+    }
   }
 
   messagesTargetConnected() {
@@ -21,7 +46,10 @@ export default class extends Controller {
     const form = event.target
     const textarea = form.querySelector('textarea')
     
-    if (textarea && textarea.value.trim() === '') {
+    // Check if we have content
+    const hasText = textarea && textarea.value.trim() !== ''
+    
+    if (!hasText) {
       event.preventDefault()
       return
     }
@@ -40,7 +68,9 @@ export default class extends Controller {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault()
       const form = event.target.closest('form')
-      if (form && event.target.value.trim() !== '') {
+      const hasText = event.target.value.trim() !== ''
+      
+      if (form && hasText) {
         form.requestSubmit()
       }
     }

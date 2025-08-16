@@ -74,4 +74,5 @@ class Chat < ApplicationRecord
 
     cloud_prefixes.any? { |prefix| model_id.downcase.start_with?(prefix.downcase) }
   end
+
 end
