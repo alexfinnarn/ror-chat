@@ -1,6 +1,6 @@
 <%= turbo_stream_from [@chat, "messages"] %>
 
-<div class="flex flex-col h-screen bg-gray-50 mx-auto" data-controller="chat" style="flex:auto;">
+<div class="flex flex-col h-screen bg-gray-50 mx-auto" data-controller="chat">
   <!-- Header -->
   <div class="flex-none bg-white border-b border-gray-200 px-6 py-4">
     <div class="flex items-center justify-between">
@@ -24,10 +24,10 @@
   </div>
 
   <!-- Messages Container -->
-  <div class="flex-1 overflow-y-auto" data-chat-target="messages">
+  <div class="flex-1 overflow-y-auto overflow-x-hidden" data-chat-target="messages">
     <div id="messages" 
          data-controller="message-ordering" 
-         class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+         class="max-w-6xl mx-auto px-4 py-6 space-y-6 break-words">
       <%= render @chat.messages.order(:created_at) %>
     </div>
   </div>

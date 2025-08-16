@@ -83,3 +83,44 @@ This project follows the Model Context Protocol specification for building MCP c
 - Tools: For function calling capabilities
 
 The ruby_llm gem provides the core MCP client functionality through the `acts_as_chat` and `acts_as_message` mixins.
+
+## Artifact System
+
+This project includes a plugin-based artifact system in `lib/artifacts/` for handling special content types in LLM responses:
+
+- **ThinkingArtifact**: Renders `<thinking>` and `<think>` tags as collapsible dropdowns
+- **CodeArtifact**: Renders `<code>` tags with syntax highlighting and copy buttons
+- **ToolUseArtifact**: Renders `<tool_use>` tags for MCP tool interactions
+
+### Adding New Artifacts
+
+Create new artifact plugins by extending `Artifacts::BaseArtifact`:
+
+```ruby
+# lib/artifacts/my_artifact.rb
+class MyArtifact < Artifacts::BaseArtifact
+  def self.pattern
+    /<my_tag>/
+  end
+  
+  def render(dark_mode: false)
+    # Custom rendering logic
+  end
+end
+
+# Auto-register the artifact
+Artifacts::ArtifactRegistry.register(MyArtifact)
+```
+
+## Development Guidelines
+
+### Code Philosophy
+- **No backward compatibility**: This is a modern codebase that evolves without maintaining legacy interfaces
+- **Clean and focused**: Write code for current requirements, not hypothetical future needs
+- **Plugin architecture**: Prefer extensible plugin systems over hardcoded conditionals
+- **Rails conventions**: Follow Rails best practices and omakase philosophy
+
+### File Organization
+- `app/` - Standard Rails application code
+- `lib/` - Custom libraries and plugins (artifacts, utilities)
+- `test/` - Comprehensive test coverage including unit, view, and integration tests

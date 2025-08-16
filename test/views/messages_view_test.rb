@@ -28,7 +28,7 @@ class MessagesViewTest < ActionView::TestCase
     rendered = render partial: "messages/message", locals: { message: message }
 
     # Should include thinking dropdown
-    assert_includes rendered, "details"
+    assert_includes rendered, "artifact-thinking"
     assert_includes rendered, "Thinking..."
     assert_includes rendered, "Let me analyze this problem step by step."
 
@@ -74,7 +74,7 @@ class MessagesViewTest < ActionView::TestCase
 
     rendered = render partial: "messages/message", locals: { message: message }
 
-    assert_includes rendered, "details"
+    assert_includes rendered, "artifact-thinking"
     assert_includes rendered, "Processing the request..."
     assert_includes rendered, "Here's the result."
   end

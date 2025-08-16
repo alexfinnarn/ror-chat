@@ -14,3 +14,10 @@ details[open] summary svg {
   transform: rotate(90deg);
 }
 
+pre {
+    overflow-x: scroll;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+
