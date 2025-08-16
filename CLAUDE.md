@@ -120,6 +120,33 @@ Artifacts::ArtifactRegistry.register(MyArtifact)
 - **Plugin architecture**: Prefer extensible plugin systems over hardcoded conditionals
 - **Rails conventions**: Follow Rails best practices and omakase philosophy
 
+### Tailwind CSS Guidelines
+
+**Use utility classes directly for:**
+- One-off components with unique styling
+- Layout classes (flex, grid, containers)
+- Component variations (hover states, responsive design)
+- Prototyping and initial development
+
+**Use @apply directives for:**
+- Repeated style patterns across multiple elements
+- Complex component styling that would clutter HTML
+- Semantic content styling (like markdown output)
+- Base component styles that need consistent application
+
+**Example patterns:**
+```css
+/* Good: Repeated patterns abstracted with @apply */
+.markdown-content h1 { @apply text-lg font-semibold mb-2 mt-4; }
+.btn-primary { @apply bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded; }
+
+<!-- Good: Layout and unique styles as utilities -->
+<div class="flex items-center justify-between p-4 bg-gray-50">
+  <h1 class="text-2xl font-bold text-gray-900">Title</h1>
+  <button class="btn-primary">Action</button>
+</div>
+```
+
 ### File Organization
 - `app/` - Standard Rails application code
 - `lib/` - Custom libraries and plugins (artifacts, utilities)
