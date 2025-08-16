@@ -5,7 +5,7 @@ Rails.application.routes.draw do
 
   # Nested routes for chats and messages
   resources :chats do
-    resources :messages, except: [:show] # messages don't typically need individual show pages
+    resources :messages, except: [ :show ] # messages don't typically need individual show pages
   end
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

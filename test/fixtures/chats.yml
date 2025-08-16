@@ -1,0 +1,14 @@
+thinking_chat:
+  title: "Thinking Mode Test Chat"
+  model_id: "deepseekr1:8b"
+  user: one
+
+regular_chat:
+  title: "Regular Chat"
+  model_id: "gpt-4"
+  user: one
+
+empty_chat:
+  title: "Empty Chat"
+  model_id: "claude-3-sonnet-20240229"
+  user: two

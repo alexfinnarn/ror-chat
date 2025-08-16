@@ -4,7 +4,7 @@ class ChatsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @user = User.create!(email_address: "test@example.com", password: "password")
     @chat = @user.chats.create!(model_id: "gpt-4", title: "Test Chat")
-    
+
     # Simulate authentication by creating a session
     @session = @user.sessions.create!(user_agent: "test", ip_address: "127.0.0.1")
     # Login by posting to the sessions endpoint to set the proper cookie
@@ -14,7 +14,7 @@ class ChatsControllerTest < ActionDispatch::IntegrationTest
   test "should get index" do
     get chats_url
     assert_response :success
-    assert_select "h1", "Your Chats"
+    assert_select "h1", "Your chat history"
   end
 
   test "should get new" do

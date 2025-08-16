@@ -1,5 +1,5 @@
 class OllamaConfig
-  CONFIG_PATH = Rails.root.join('config', 'ollama_models.yml').freeze
+  CONFIG_PATH = Rails.root.join("config", "ollama_models.yml").freeze
 
   class << self
     def models
@@ -7,7 +7,7 @@ class OllamaConfig
     end
 
     def model_ids
-      @model_ids ||= models.map { |m| m['id'] }
+      @model_ids ||= models.map { |m| m["id"] }
     end
 
     def model_exists?(model_id)
@@ -21,11 +21,11 @@ class OllamaConfig
     end
 
     def models_for_select
-      models.map { |m| [m['display_name'], m['id']] }
+      models.map { |m| [ m["display_name"], m["id"] ] }
     end
 
     def last_updated
-      config_data['last_updated']
+      config_data["last_updated"]
     end
 
     def models_count
@@ -36,8 +36,8 @@ class OllamaConfig
 
     def load_models
       return [] unless File.exist?(CONFIG_PATH)
-      
-      config_data['models'] || []
+
+      config_data["models"] || []
     rescue => e
       Rails.logger.error "Failed to load Ollama models config: #{e.message}"
       []

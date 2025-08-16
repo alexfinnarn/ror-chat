@@ -9,3 +9,8 @@
  * Consider organizing styles into separate files for maintainability.
  */
 
+/* Thinking dropdown styles */
+details[open] summary svg {
+  transform: rotate(90deg);
+}
+

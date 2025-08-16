@@ -1,8 +1,12 @@
 class ChatsController < ApplicationController
-  before_action :set_chat, only: [:show, :edit, :update, :destroy]
+  before_action :set_chat, only: [ :show, :edit, :update, :destroy ]
 
   def index
     @chats = Current.user.chats.order(updated_at: :desc)
+
+    if params[:search].present?
+      @chats = @chats.search_by_title_and_model(params[:search])
+    end
   end
 
   def show
@@ -14,9 +18,9 @@ class ChatsController < ApplicationController
 
   def create
     @chat = Current.user.chats.build(chat_params)
-    
+
     if @chat.save
-      redirect_to @chat, notice: 'Chat was successfully created.'
+      redirect_to @chat, notice: "Chat was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -29,6 +33,8 @@ class ChatsController < ApplicationController
   end
 
   def destroy
+    @chat.destroy
+    redirect_to chats_path, notice: "Chat was successfully deleted."
   end
 
   private

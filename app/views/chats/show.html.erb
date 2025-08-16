@@ -1,6 +1,6 @@
 <%= turbo_stream_from [@chat, "messages"] %>
 
-<div class="flex flex-col h-screen bg-gray-50" data-controller="chat">
+<div class="flex flex-col h-screen bg-gray-50 mx-auto" data-controller="chat" style="flex:auto;">
   <!-- Header -->
   <div class="flex-none bg-white border-b border-gray-200 px-6 py-4">
     <div class="flex items-center justify-between">
@@ -11,6 +11,12 @@
         <p class="text-sm text-gray-500">Model: <%= @chat.model_id %></p>
       </div>
       <div class="flex space-x-2">
+        <%= link_to new_chat_path, class: "px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors flex items-center gap-1" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          New chat
+        <% end %>
         <%= link_to "Edit", edit_chat_path(@chat), class: "px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors" %>
         <%= link_to "Back to Chats", chats_path, class: "px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors" %>
       </div>
@@ -21,14 +27,14 @@
   <div class="flex-1 overflow-y-auto" data-chat-target="messages">
     <div id="messages" 
          data-controller="message-ordering" 
-         class="max-w-4xl mx-auto px-4 py-6 space-y-6">
+         class="max-w-6xl mx-auto px-4 py-6 space-y-6">
       <%= render @chat.messages.order(:created_at) %>
     </div>
   </div>
 
   <!-- Message Input Form -->
   <div class="flex-none bg-white border-t border-gray-200 px-6 py-4">
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-6xl mx-auto">
       <%= render 'messages/form' %>
     </div>
   </div>

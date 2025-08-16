@@ -1,0 +1,36 @@
+user_question:
+  role: "user"
+  content: "What is the meaning of life?"
+  chat: thinking_chat
+
+thinking_response:
+  role: "assistant"
+  content: "<thinking>This is a deep philosophical question. I should consider various perspectives including religious, philosophical, and scientific viewpoints.</thinking>The meaning of life is a profound question that has been contemplated by philosophers, theologians, and thinkers throughout history. While there's no single answer, many find meaning through relationships, personal growth, and contributing to something greater than themselves."
+  chat: thinking_chat
+
+regular_response:
+  role: "assistant"
+  content: "This is a regular response without any thinking content."
+  chat: regular_chat
+
+empty_assistant:
+  role: "assistant"
+  content: ""
+  chat: regular_chat
+
+multiline_thinking:
+  role: "assistant"
+  content: |
+    <thinking>
+    Let me break this down step by step:
+    1. First, I need to understand the context
+    2. Then, I'll analyze the requirements
+    3. Finally, I'll provide a comprehensive solution
+    </thinking>
+    Based on my analysis, here's a structured approach to solve this problem.
+  chat: thinking_chat
+
+think_tag_message:
+  role: "assistant"
+  content: "<think>Using alternative think tags for variety</think>This demonstrates the think tag variant."
+  chat: thinking_chat

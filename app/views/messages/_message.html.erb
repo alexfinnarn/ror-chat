@@ -21,9 +21,29 @@
             AI
           </div>
           <div class="flex-1 bg-white border border-gray-200 rounded-lg px-4 py-3 shadow-sm">
-            <div id="<%= dom_id(message, "content") %>">
-              <%= message.content.present? ? markdown_to_html(message.content, dark_mode: false) : '<span class="thinking text-gray-500">Thinking...</span>'.html_safe %>
-            </div>
+            <% if message.content.present? && message.has_thinking_content? %>
+              <!-- Thinking Content Dropdown -->
+              <details class="mb-3">
+                <summary class="cursor-pointer text-sm text-gray-600 hover:text-gray-800 flex items-center">
+                  Thinking...
+                  <svg class="w-4 h-4 mr-1 transition-transform duration-200" fill="none" style="width:1.75rem" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </summary>
+                <div class="mt-2 pl-5 text-sm text-gray-700 bg-gray-50 rounded-lg p-3 border-l-4 border-gray-300">
+                  <%= markdown_to_html(message.thinking_content, dark_mode: false) if message.thinking_content %>
+                </div>
+              </details>
+              <!-- Main Content -->
+              <div id="<%= dom_id(message, "content") %>">
+                <%= markdown_to_html(message.main_content, dark_mode: false) %>
+              </div>
+            <% else %>
+              <!-- Regular Content or Loading State -->
+              <div id="<%= dom_id(message, "content") %>">
+                <%= message.content.present? ? markdown_to_html(message.content, dark_mode: false) : '<span class="thinking text-gray-500">Thinking...</span>'.html_safe %>
+              </div>
+            <% end %>
           </div>
         </div>
       <% end %>
