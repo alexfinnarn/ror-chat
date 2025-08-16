@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_10_180424) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_16_221748) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "vector"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -48,7 +49,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_10_180424) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.string "title"
+    t.bigint "project_id"
+    t.index ["project_id"], name: "index_chats_on_project_id"
     t.index ["user_id"], name: "index_chats_on_user_id"
+  end
+
+  create_table "documents", force: :cascade do |t|
+    t.text "content"
+    t.string "title"
+    t.string "file_path"
+    t.string "content_type"
+    t.vector "embedding", limit: 768
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "project_id", null: false
+    t.index ["embedding"], name: "index_documents_on_embedding", opclass: :vector_l2_ops, using: :hnsw
+    t.index ["project_id"], name: "index_documents_on_project_id"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -63,6 +79,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_10_180424) do
     t.datetime "updated_at", null: false
     t.index ["chat_id"], name: "index_messages_on_chat_id"
     t.index ["tool_call_id"], name: "index_messages_on_tool_call_id"
+  end
+
+  create_table "projects", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "instructions"
+    t.index ["user_id"], name: "index_projects_on_user_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -95,8 +121,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_10_180424) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "chats", "projects"
   add_foreign_key "chats", "users"
+  add_foreign_key "documents", "projects"
   add_foreign_key "messages", "chats"
+  add_foreign_key "projects", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "tool_calls", "messages"
 end

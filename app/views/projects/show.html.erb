@@ -1,0 +1,101 @@
+<div class="flex h-screen">
+  <!-- Main Content Area -->
+  <div class="flex-1 flex flex-col">
+    <!-- Header -->
+    <div class="border-b bg-white px-6 py-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-bold"><%= @project.name %></h1>
+          <p class="text-gray-600"><%= @project.description %></p>
+        </div>
+        <div class="space-x-2">
+          <%= link_to "New Chat", new_project_chat_path(@project), class: "bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded" %>
+          <%= link_to "Edit Project", edit_project_path(@project), class: "bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded" %>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Chats Content -->
+    <div class="flex-1 overflow-y-auto p-6">
+      <h2 class="text-lg font-semibold mb-4">Chats</h2>
+      <% if @chats.any? %>
+        <div class="space-y-3">
+          <% @chats.each do |chat| %>
+            <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+              <h3 class="font-medium mb-1">
+                <%= link_to chat.title.presence || "Chat #{chat.id}", [@project, chat], class: "text-blue-600 hover:text-blue-800" %>
+              </h3>
+              <div class="text-sm text-gray-500">
+                <span>Model: <%= chat.model_id %></span> • 
+                <span><%= pluralize(chat.messages.count, 'message') %></span> • 
+                <span><%= time_ago_in_words(chat.updated_at) %> ago</span>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="text-center py-8 border-2 border-dashed border-gray-300 rounded-lg">
+          <p class="text-gray-500 mb-3">No chats yet</p>
+          <%= link_to "Start First Chat", new_project_chat_path(@project), class: "text-blue-600 hover:text-blue-800" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+  
+  <!-- Right Sidebar -->
+  <div class="w-80 bg-gray-50 border-l flex flex-col">
+    <!-- Instructions Section -->
+    <div class="p-4 border-b">
+      <h3 class="font-semibold mb-3">Project Instructions</h3>
+      <%= form_with model: @project, local: false, class: "space-y-3" do |f| %>
+        <%= f.text_area :instructions, 
+            placeholder: "Enter instructions that will be added to every chat in this project...", 
+            rows: 4,
+            value: @project.instructions,
+            class: "w-full p-2 border border-gray-300 rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        <%= f.submit "Save Instructions", class: "w-full bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-sm" %>
+      <% end %>
+    </div>
+    
+    <!-- File Upload Section -->
+    <div class="p-4 border-b">
+      <h3 class="font-semibold mb-3">Upload Documents</h3>
+      <%= form_with url: project_documents_path(@project), multipart: true, local: false, class: "space-y-3" do |f| %>
+        <%= f.file_field :file, 
+            accept: ".pdf,.txt,.md,.docx", 
+            class: "w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" %>
+        <%= f.submit "Upload", class: "w-full bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded text-sm" %>
+      <% end %>
+      <p class="text-xs text-gray-500 mt-2">Supported: PDF, TXT, MD, DOCX</p>
+    </div>
+    
+    <!-- Documents List -->
+    <div class="flex-1 overflow-y-auto">
+      <div class="p-4">
+        <h3 class="font-semibold mb-3">Documents (<%= @documents.count %>)</h3>
+        <div id="documents-list" class="space-y-2">
+          <% @documents.each do |document| %>
+            <div class="flex items-center justify-between p-2 bg-white rounded border group hover:shadow-sm" data-document-id="<%= document.id %>">
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium text-gray-900 truncate"><%= document.title %></div>
+                <div class="text-xs text-gray-500"><%= document.content_type %></div>
+              </div>
+              <%= link_to [@project, document], 
+                  method: :delete, 
+                  confirm: "Are you sure?",
+                  remote: true,
+                  class: "ml-2 p-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+        <% if @documents.empty? %>
+          <p class="text-sm text-gray-500 text-center py-4">No documents uploaded yet</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -40,6 +40,29 @@ class ChatStreamJob < ApplicationJob
         chat_client.add_message(role: msg.role, content: msg.content)
       end
 
+      # Add RAG enhancement if chat belongs to a project
+      if chat.project_id.present?
+        project = chat.project
+        enhanced_parts = []
+
+        # Add project instructions if present
+        if project.instructions.present?
+          enhanced_parts << "Project Instructions:\n#{project.instructions}"
+        end
+
+        # Add relevant documents
+        relevant_docs = DocumentSearchService.search(user_content, project_id: chat.project_id)
+        if relevant_docs.present?
+          enhanced_parts << "Context from project documents:\n#{relevant_docs}"
+        end
+
+        # Combine everything if we have enhancements
+        if enhanced_parts.any?
+          enhanced_prompt = "#{enhanced_parts.join("\n\n")}\n\nUser question: #{user_content}"
+          user_content = enhanced_prompt
+        end
+      end
+
       # Process the chat completion with streaming
       chat_client.ask(user_content) do |chunk|
         if chunk.content && assistant_message
@@ -69,5 +92,4 @@ class ChatStreamJob < ApplicationJob
       )
     end
   end
-
 end

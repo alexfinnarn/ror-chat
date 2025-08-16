@@ -74,5 +74,10 @@ gem "ruby_llm"
 gem "redcarpet" # Markdown processor for AI message formatting
 gem "nokogiri" # HTML parsing for applying Tailwind classes
 
+# RAG system dependencies
+gem "neighbor" # Vector similarity search
+gem "pdf-reader" # PDF text extraction
+gem "docx" # Word document processing
+
 gem "tailwindcss-ruby", "~> 4.1"
 gem "tailwindcss-rails", "~> 4.3"

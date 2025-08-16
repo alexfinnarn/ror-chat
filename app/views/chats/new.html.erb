@@ -4,7 +4,7 @@
     <p class="text-gray-600">Start a conversation with your preferred AI model</p>
   </div>
 
-  <%= form_with model: @chat, local: true, class: "space-y-6" do |form| %>
+  <%= form_with model: [@project, @chat].compact, local: true, class: "space-y-6" do |form| %>
     <% if @chat.errors.any? %>
       <div class="bg-red-50 border border-red-200 rounded-lg p-4">
         <div class="flex">
@@ -40,7 +40,7 @@
     </div>
 
     <div class="flex items-center justify-between pt-4">
-      <%= link_to "Cancel", chats_path, class: "px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors" %>
+      <%= link_to "Cancel", @project ? @project : chats_path, class: "px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors" %>
       <%= form.submit "Create Chat", class: "bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors" %>
     </div>
   <% end %>

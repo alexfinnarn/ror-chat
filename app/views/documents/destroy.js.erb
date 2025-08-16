@@ -1,0 +1,21 @@
+// Remove the document from the list
+const documentElement = document.querySelector('[data-document-id="<%= @document.id %>"]');
+if (documentElement) {
+  documentElement.remove();
+}
+
+// Update the document count
+const heading = document.querySelector('h3');
+if (heading && heading.textContent.includes('Documents')) {
+  const currentCount = parseInt(heading.textContent.match(/\d+/)[0] || 0);
+  const newCount = Math.max(0, currentCount - 1);
+  heading.textContent = `Documents (${newCount})`;
+  
+  // Show empty state if no documents left
+  if (newCount === 0) {
+    const documentsList = document.getElementById('documents-list');
+    if (documentsList && documentsList.children.length === 0) {
+      documentsList.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">No documents uploaded yet</p>';
+    }
+  }
+}

@@ -5,20 +5,42 @@
   <div class="flex-none bg-white border-b border-gray-200 px-6 py-4">
     <div class="flex items-center justify-between">
       <div>
+        <% if @chat.project %>
+          <div class="flex items-center space-x-2 text-sm text-blue-600 mb-1">
+            <%= link_to @chat.project.name, @chat.project, class: "hover:text-blue-800" %>
+            <span class="text-gray-400">/</span>
+            <span class="text-gray-600">Chat</span>
+          </div>
+        <% end %>
         <h1 class="text-xl font-semibold text-gray-900">
           <%= @chat.title || "Chat #{@chat.id}" %>
         </h1>
-        <p class="text-sm text-gray-500">Model: <%= @chat.model_id %></p>
+        <div class="text-sm text-gray-500">
+          <span>Model: <%= @chat.model_id %></span>
+          <% if @chat.project %>
+            <span> • </span>
+            <span><%= pluralize(@chat.project.documents.count, 'document') %> available</span>
+          <% end %>
+        </div>
       </div>
       <div class="flex space-x-2">
-        <%= link_to new_chat_path, class: "px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors flex items-center gap-1" do %>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-          </svg>
-          New chat
+        <% if @chat.project %>
+          <%= link_to new_project_chat_path(@chat.project), class: "px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors flex items-center gap-1" do %>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            New chat
+          <% end %>
+          <%= link_to "Back to Project", @chat.project, class: "px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors" %>
+        <% else %>
+          <%= link_to new_chat_path, class: "px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors flex items-center gap-1" do %>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            New chat
+          <% end %>
+          <%= link_to "Back to Chats", chats_path, class: "px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors" %>
         <% end %>
-        <%= link_to "Edit", edit_chat_path(@chat), class: "px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors" %>
-        <%= link_to "Back to Chats", chats_path, class: "px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md transition-colors" %>
       </div>
     </div>
   </div>

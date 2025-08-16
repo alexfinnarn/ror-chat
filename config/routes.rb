@@ -3,7 +3,15 @@ Rails.application.routes.draw do
   resources :passwords, param: :token
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
-  # Nested routes for chats and messages
+  # Project routes with nested documents and chats
+  resources :projects do
+    resources :documents, except: [ :edit, :update ]
+    resources :chats, except: [ :index ] do
+      resources :messages, except: [ :show ] # messages don't typically need individual show pages
+    end
+  end
+
+  # Standalone chats routes for backward compatibility
   resources :chats do
     resources :messages, except: [ :show ] # messages don't typically need individual show pages
   end
@@ -17,5 +25,5 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
-  root "chats#index"
+  root "projects#index"
 end

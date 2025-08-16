@@ -1,0 +1,31 @@
+// Add the new document to the documents list
+document.getElementById('documents-list').insertAdjacentHTML('beforeend', `
+  <div class="flex items-center justify-between p-2 bg-white rounded border group hover:shadow-sm" data-document-id="<%= @document.id %>">
+    <div class="flex-1 min-w-0">
+      <div class="text-sm font-medium text-gray-900 truncate"><%= @document.title %></div>
+      <div class="text-xs text-gray-500"><%= @document.content_type %></div>
+    </div>
+    <a href="<%= project_document_path(@project, @document) %>" 
+       data-method="delete" 
+       data-confirm="Are you sure?"
+       data-remote="true"
+       class="ml-2 p-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </a>
+  </div>
+`);
+
+// Update the document count
+const heading = document.querySelector('h3:has-text("Documents")');
+if (heading) {
+  const currentCount = parseInt(heading.textContent.match(/\d+/)[0] || 0);
+  heading.textContent = `Documents (${currentCount + 1})`;
+}
+
+// Clear the file input
+document.querySelector('input[type="file"]').value = '';
+
+// Show success message (optional)
+console.log('Document uploaded successfully!');

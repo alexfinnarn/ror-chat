@@ -3,6 +3,7 @@ class Chat < ApplicationRecord
 
   # --- Add your standard Rails model logic below ---
   belongs_to :user
+  belongs_to :project, optional: true
   validates :model_id, presence: true
 
   broadcasts_to ->(chat) { [ chat, "messages" ] }
@@ -74,5 +75,4 @@ class Chat < ApplicationRecord
 
     cloud_prefixes.any? { |prefix| model_id.downcase.start_with?(prefix.downcase) }
   end
-
 end

@@ -1,4 +1,5 @@
 class ChatsController < ApplicationController
+  before_action :set_project, only: [ :new, :create, :show, :edit, :update, :destroy ], if: :project_nested?
   before_action :set_chat, only: [ :show, :edit, :update, :destroy ]
 
   def index
@@ -13,16 +14,31 @@ class ChatsController < ApplicationController
   end
 
   def new
-    @chat = Current.user.chats.build
+    if @project
+      @chat = @project.chats.build
+    else
+      @chat = Current.user.chats.build
+    end
   end
 
   def create
-    @chat = Current.user.chats.build(chat_params)
+    if @project
+      @chat = @project.chats.build(chat_params)
+      @chat.user = Current.user
 
-    if @chat.save
-      redirect_to @chat, notice: "Chat was successfully created."
+      if @chat.save
+        redirect_to [ @project, @chat ], notice: "Chat was successfully created."
+      else
+        render :new, status: :unprocessable_entity
+      end
     else
-      render :new, status: :unprocessable_entity
+      @chat = Current.user.chats.build(chat_params)
+
+      if @chat.save
+        redirect_to @chat, notice: "Chat was successfully created."
+      else
+        render :new, status: :unprocessable_entity
+      end
     end
   end
 
@@ -39,8 +55,20 @@ class ChatsController < ApplicationController
 
   private
 
+  def set_project
+    @project = Current.user.projects.find(params[:project_id]) if params[:project_id]
+  end
+
+  def project_nested?
+    params[:project_id].present?
+  end
+
   def set_chat
-    @chat = Current.user.chats.find(params[:id])
+    if @project
+      @chat = @project.chats.find(params[:id])
+    else
+      @chat = Current.user.chats.find(params[:id])
+    end
   end
 
   def chat_params

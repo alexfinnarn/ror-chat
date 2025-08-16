@@ -1,8 +1,13 @@
 ---
-last_updated: '2025-08-12T12:09:37Z'
+last_updated: '2025-08-16T22:14:31Z'
 api_endpoint: http://localhost:11434
-models_count: 6
+models_count: 7
 models:
+- id: nomic-embed-text:v1.5
+  name: nomic-embed-text:v1.5
+  display_name: Nomic-embed-text:v1.5 (Ollama)
+  size: 274302450
+  modified_at: '2025-08-16T18:13:55.81076697-04:00'
 - id: gpt-oss:20b
   name: gpt-oss:20b
   display_name: Gpt-oss:20b (Ollama)
