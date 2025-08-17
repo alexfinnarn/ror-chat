@@ -6,7 +6,7 @@ RubyLLM.configure do |config|
 
   # Ollama configuration
   config.ollama_api_base = "http://localhost:11434"
-  
+
   # Configure local embeddings using Ollama
   config.openai_api_base = "http://localhost:11434/v1"
   config.openai_api_key = "dummy-key-for-ollama"

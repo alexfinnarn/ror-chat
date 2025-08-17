@@ -170,3 +170,12 @@ Artifacts::ArtifactRegistry.register(MyArtifact)
 - `app/` - Standard Rails application code
 - `lib/` - Custom libraries and plugins (artifacts, utilities)
 - `test/` - Comprehensive test coverage including unit, view, and integration tests
+
+## Important Development Reminders
+
+### Server Management
+**ALWAYS close background servers when done testing!**
+- When starting `bin/rails server` or similar background processes for testing
+- Use `KillBash` tool or `Ctrl+C` to terminate before ending conversations
+- Don't leave servers running as it forces users to manually kill processes
+- Only keep servers running if user explicitly wants them to stay open

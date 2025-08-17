@@ -33,4 +33,9 @@ module ApplicationHelper
     html = markdown.render(text)
     content_tag(:div, html.html_safe, class: "markdown-content")
   end
+
+  def recent_chats(limit: 10)
+    return [] unless current_user
+    current_user.chats.order(updated_at: :desc).limit(limit)
+  end
 end

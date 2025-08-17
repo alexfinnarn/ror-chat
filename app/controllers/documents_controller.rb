@@ -20,6 +20,19 @@ class DocumentsController < ApplicationController
     if params[:file].present?
       uploaded_file = params[:file]
 
+      # Check file size limit
+      if uploaded_file.size > Document::MAX_FILE_SIZE
+        @error_message = "File too large (maximum #{Document::MAX_FILE_SIZE / 1.megabyte}MB allowed)"
+        respond_to do |format|
+          format.html {
+            @document.errors.add(:file, @error_message)
+            render :new
+          }
+          format.js { render "error" }
+        end
+        return
+      end
+
       # Save uploaded file temporarily
       temp_path = Rails.root.join("tmp", uploaded_file.original_filename)
       File.open(temp_path, "wb") do |file|
@@ -30,6 +43,12 @@ class DocumentsController < ApplicationController
         # Extract text content
         content = TextExtractionService.extract_from_file(temp_path)
 
+        # Truncate content if it exceeds the limit and add warning
+        if content.length > Document::MAX_CONTENT_LENGTH
+          content = content[0...Document::MAX_CONTENT_LENGTH]
+          Rails.logger.warn "Document content truncated to #{Document::MAX_CONTENT_LENGTH} characters: #{uploaded_file.original_filename}"
+        end
+
         @document.assign_attributes(
           title: uploaded_file.original_filename,
           content: content,
@@ -38,8 +57,13 @@ class DocumentsController < ApplicationController
         )
 
         if @document.save
+          notice_message = "Document uploaded successfully."
+          if content.length == Document::MAX_CONTENT_LENGTH
+            notice_message += " Note: Content was truncated to #{Document::MAX_CONTENT_LENGTH} characters."
+          end
+
           respond_to do |format|
-            format.html { redirect_to @project, notice: "Document uploaded successfully." }
+            format.html { redirect_to @project, notice: notice_message }
             format.js { render "create" }
           end
         else

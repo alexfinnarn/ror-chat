@@ -5,9 +5,9 @@ class DocumentSearchService
       config.openai_api_base = "http://localhost:11434/v1"
       config.openai_api_key = "dummy-key-for-ollama"
     end
-    
+
     embedding = ollama_context.embed(
-      query, 
+      query,
       model: "nomic-embed-text:v1.5",
       provider: :openai,
       assume_model_exists: true
@@ -23,7 +23,7 @@ class DocumentSearchService
     ).limit(limit)
 
     results.map { |doc|
-      "Document: #{doc.title}\nContent: #{doc.content.truncate(800)}"
+      "Document: #{doc.title}\nContent: #{doc.content.truncate(Document::SEARCH_RESULT_TRUNCATION)}"
     }.join("\n\n---\n\n")
   rescue => e
     Rails.logger.error "Document search failed: #{e.message}"
