@@ -1,3 +1,5 @@
+require_relative "../lib/web_content_tool"
+
 class ChatStreamJob < ApplicationJob
   queue_as :default
 
@@ -29,6 +31,12 @@ class ChatStreamJob < ApplicationJob
         )
       else
         RubyLLM.chat(model: chat.model_id)
+      end
+
+      # Add web content tool to the chat client (only for models that support tools)
+      if chat.supports_tools?
+        web_tool = WebContentTool.new
+        chat_client.with_tool(web_tool)
       end
 
       # Add previous messages to the conversation (excluding the current user message and assistant message)

@@ -73,6 +73,7 @@ end
 gem "ruby_llm"
 gem "redcarpet" # Markdown processor for AI message formatting
 gem "nokogiri" # HTML parsing for applying Tailwind classes
+gem "reverse_markdown" # Convert HTML to markdown for web content tool
 
 # RAG system dependencies
 gem "neighbor" # Vector similarity search

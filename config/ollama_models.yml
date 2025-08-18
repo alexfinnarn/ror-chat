@@ -1,40 +1,54 @@
 ---
-last_updated: '2025-08-16T22:14:31Z'
+last_updated: '2025-08-18T02:27:39Z'
 api_endpoint: http://localhost:11434
 models_count: 7
 models:
 - id: nomic-embed-text:v1.5
   name: nomic-embed-text:v1.5
   display_name: Nomic-embed-text:v1.5 (Ollama)
+  supports_tools: false
+  tool_probe_detail: 'error: HTTP 400: Bad Request'
   size: 274302450
   modified_at: '2025-08-16T18:13:55.81076697-04:00'
 - id: gpt-oss:20b
   name: gpt-oss:20b
   display_name: Gpt-oss:20b (Ollama)
+  supports_tools: false
+  tool_probe_detail: 'error: timeout after 30s'
   size: 13780173839
   modified_at: '2025-08-05T20:39:25.225606387-04:00'
 - id: qwen3:14b
   name: qwen3:14b
-  display_name: Qwen3:14b (Ollama)
+  display_name: Qwen3:14b (Ollama + Tools)
+  supports_tools: true
+  tool_probe_detail: returned tool_calls (get_current_weather)
   size: 9276198565
   modified_at: '2025-08-04T10:11:59.471433815-04:00'
 - id: gemma3:12b
   name: gemma3:12b
   display_name: Gemma3:12b (Ollama)
+  supports_tools: false
+  tool_probe_detail: 'error: HTTP 400: Bad Request'
   size: 8149190253
   modified_at: '2025-08-04T09:47:34.373747137-04:00'
 - id: qwen3:8b
   name: qwen3:8b
-  display_name: Qwen3:8b (Ollama)
+  display_name: Qwen3:8b (Ollama + Tools)
+  supports_tools: true
+  tool_probe_detail: returned tool_calls (get_current_weather)
   size: 5225388164
   modified_at: '2025-08-01T09:47:48.303766065-04:00'
 - id: deepseek-r1:8b
   name: deepseek-r1:8b
   display_name: Deepseek-r1:8b (Ollama)
+  supports_tools: false
+  tool_probe_detail: 'error: HTTP 400: Bad Request'
   size: 5225376047
   modified_at: '2025-07-30T21:51:25.501060536-04:00'
 - id: llama3.2:latest
   name: llama3.2:latest
-  display_name: Llama3.2:latest (Ollama)
+  display_name: Llama3.2:latest (Ollama + Tools)
+  supports_tools: true
+  tool_probe_detail: returned tool_calls (get_current_weather)
   size: 2019393189
   modified_at: '2025-04-02T15:06:26.421491632-04:00'

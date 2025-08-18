@@ -32,6 +32,15 @@ class OllamaConfig
       models.size
     end
 
+    def model_supports_tools?(model_id)
+      model = models.find { |m| m["id"] == model_id }
+      model&.dig("supports_tools") || false
+    end
+
+    def tool_capable_models
+      models.select { |m| m["supports_tools"] }
+    end
+
     private
 
     def load_models

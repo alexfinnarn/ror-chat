@@ -75,4 +75,33 @@ class Chat < ApplicationRecord
 
     cloud_prefixes.any? { |prefix| model_id.downcase.start_with?(prefix.downcase) }
   end
+
+  def supports_tools?
+    return false if model_id.nil?
+
+    # Cloud models generally support tools
+    return true if known_cloud_model?
+
+    # Check Ollama config for tool support (if available)
+    if ollama_model? && OllamaConfig.model_exists?(model_id)
+      return OllamaConfig.model_supports_tools?(model_id)
+    end
+
+    # Fallback to pattern matching for models not in config
+    tool_supporting_ollama_models = [
+      # Llama 3.1 and 3.2 series
+      /^llama3\.1/i,
+      /^llama3\.2/i,
+      /^llama3:.*3\.1/i,
+      /^llama3:.*3\.2/i,
+      # Mistral series
+      /^mistral/i,
+      # Other known tool-supporting models
+      /^qwen.*:.*chat/i,
+      /^phi.*:.*instruct/i
+    ]
+
+    tool_supporting_ollama_models.any? { |pattern| model_id.match?(pattern) }
+  end
+
 end
