@@ -78,7 +78,8 @@ gem "reverse_markdown" # Convert HTML to markdown for web content tool
 # RAG system dependencies
 gem "neighbor" # Vector similarity search
 gem "pdf-reader" # PDF text extraction
-gem "docx" # Word document processing
+gem "docx" # Word document processingg
 
 gem "tailwindcss-ruby", "~> 4.1"
 gem "tailwindcss-rails", "~> 4.3"
+

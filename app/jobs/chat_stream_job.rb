@@ -33,8 +33,9 @@ class ChatStreamJob < ApplicationJob
         RubyLLM.chat(model: chat.model_id)
       end
 
-      # Add web content tool to the chat client (only for models that support tools)
+      # Add tools to the chat client (only for models that support tools)
       if chat.supports_tools?
+        # Add custom web content tool
         web_tool = WebContentTool.new
         chat_client.with_tool(web_tool)
       end
