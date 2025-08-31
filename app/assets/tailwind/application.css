@@ -72,3 +72,27 @@
 .dark .markdown-content a {
   @apply text-blue-200 hover:text-blue-100;
 }
+
+.markdown-content table {
+  @apply w-full border-collapse border border-gray-300 mb-3;
+}
+
+.dark .markdown-content table {
+  @apply border-white/30;
+}
+
+.markdown-content th {
+  @apply border border-gray-300 px-3 py-2 bg-gray-100 font-semibold text-left;
+}
+
+.dark .markdown-content th {
+  @apply border-white/30 bg-white/10;
+}
+
+.markdown-content td {
+  @apply border border-gray-300 px-3 py-2;
+}
+
+.dark .markdown-content td {
+  @apply border-white/30;
+}
