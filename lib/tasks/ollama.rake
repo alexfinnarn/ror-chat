@@ -40,9 +40,9 @@ namespace :ollama do
         models = ollama_models.map.with_index do |model, index|
           model_name = model["name"]
           puts "  [#{index + 1}/#{ollama_models.size}] Probing #{model_name}..."
-          
+
           tool_support = probe_model_for_tools(model_name, ollama_host, read_timeout)
-          
+
           display_name = if tool_support[:supports_tools]
             "#{model_name.capitalize} (Ollama + Tools)"
           else
@@ -75,11 +75,11 @@ namespace :ollama do
         puts "✅ Successfully updated #{models.size} Ollama models in #{config_path}"
         puts "\nModels found:"
         models.each do |m|
-          tool_indicator = m['supports_tools'] ? ' (Tools: YES)' : ' (Tools: NO)'
+          tool_indicator = m["supports_tools"] ? " (Tools: YES)" : " (Tools: NO)"
           puts "  - #{m['id']}#{tool_indicator}"
         end
-        
-        tools_count = models.count { |m| m['supports_tools'] }
+
+        tools_count = models.count { |m| m["supports_tools"] }
         puts "\nSummary: #{models.size} total models, #{tools_count} support tools"
 
       else
@@ -128,9 +128,9 @@ namespace :ollama do
       puts "  Last updated: #{config['last_updated'] || 'Never'}"
       puts "  Models count: #{config['models']&.size || 0}"
       puts "  API endpoint: #{config['api_endpoint'] || 'Not set'}"
-      
-      if config['models']&.any?
-        tools_count = config['models'].count { |m| m['supports_tools'] }
+
+      if config["models"]&.any?
+        tools_count = config["models"].count { |m| m["supports_tools"] }
         puts "  Tool-capable models: #{tools_count}"
       end
     end
@@ -154,7 +154,7 @@ namespace :ollama do
             "content" => "If a tool is available, you should call it."
           },
           {
-            "role" => "user", 
+            "role" => "user",
             "content" => "What is the weather in Toronto right now? Use the weather tool if needed."
           }
         ],
@@ -169,7 +169,7 @@ namespace :ollama do
                 "properties" => {
                   "city" => { "type" => "string" }
                 },
-                "required" => ["city"]
+                "required" => [ "city" ]
               }
             }
           }
@@ -184,32 +184,32 @@ namespace :ollama do
 
       if response.is_a?(Net::HTTPSuccess)
         result = JSON.parse(response.body)
-        
+
         # Check if response contains tool_calls
         message = result["message"]
         if message && message["tool_calls"]
           tool_calls = message["tool_calls"]
           # Normalize to array if single object
-          tool_calls = [tool_calls] unless tool_calls.is_a?(Array)
-          
+          tool_calls = [ tool_calls ] unless tool_calls.is_a?(Array)
+
           if tool_calls.any?
             function_names = tool_calls.map { |tc| tc.dig("function", "name") }.compact
             detail = "returned tool_calls (#{function_names.join(', ')})"
             return { supports_tools: true, detail: detail }
           end
         end
-        
+
         # No tool calls found
-        return { supports_tools: false, detail: "no tool_calls; returned plain text" }
-        
+        { supports_tools: false, detail: "no tool_calls; returned plain text" }
+
       else
-        return { supports_tools: false, detail: "error: HTTP #{response.code}: #{response.message}" }
+        { supports_tools: false, detail: "error: HTTP #{response.code}: #{response.message}" }
       end
 
     rescue Net::ReadTimeout, Net::OpenTimeout
-      return { supports_tools: false, detail: "error: timeout after #{read_timeout}s" }
+      { supports_tools: false, detail: "error: timeout after #{read_timeout}s" }
     rescue => e
-      return { supports_tools: false, detail: "error: #{e.message}" }
+      { supports_tools: false, detail: "error: #{e.message}" }
     end
   end
 end

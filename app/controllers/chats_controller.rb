@@ -50,7 +50,16 @@ class ChatsController < ApplicationController
 
   def destroy
     @chat.destroy
-    redirect_to chats_path, notice: "Chat was successfully deleted."
+    respond_to do |format|
+      format.html {
+        if @project
+          redirect_to @project, notice: "Chat was successfully deleted."
+        else
+          redirect_to chats_path, notice: "Chat was successfully deleted."
+        end
+      }
+      format.turbo_stream { render turbo_stream: turbo_stream.remove(@chat) }
+    end
   end
 
   private

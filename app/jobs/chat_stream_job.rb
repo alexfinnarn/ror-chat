@@ -1,4 +1,6 @@
 require_relative "../lib/web_content_tool"
+require_relative "../lib/document_search_tool"
+require_relative "../lib/document_list_tool"
 
 class ChatStreamJob < ApplicationJob
   queue_as :default
@@ -38,6 +40,14 @@ class ChatStreamJob < ApplicationJob
         # Add custom web content tool
         web_tool = WebContentTool.new
         chat_client.with_tool(web_tool)
+
+        # Add document tools for project chats
+        if chat.project_id.present?
+          document_search_tool = DocumentSearchTool.new(project_id: chat.project_id)
+          document_list_tool = DocumentListTool.new(project_id: chat.project_id)
+          chat_client.with_tool(document_search_tool)
+          chat_client.with_tool(document_list_tool)
+        end
       end
 
       # Add previous messages to the conversation (excluding the current user message and assistant message)
@@ -49,26 +59,12 @@ class ChatStreamJob < ApplicationJob
         chat_client.add_message(role: msg.role, content: msg.content)
       end
 
-      # Add RAG enhancement if chat belongs to a project
-      if chat.project_id.present?
+      # Add project instructions as system context if present (non-tool models only)
+      if chat.project_id.present? && !chat.supports_tools?
         project = chat.project
-        enhanced_parts = []
-
-        # Add project instructions if present
         if project.instructions.present?
-          enhanced_parts << "Project Instructions:\n#{project.instructions}"
-        end
-
-        # Add relevant documents
-        relevant_docs = DocumentSearchService.search(user_content, project_id: chat.project_id)
-        if relevant_docs.present?
-          enhanced_parts << "Context from project documents:\n#{relevant_docs}"
-        end
-
-        # Combine everything if we have enhancements
-        if enhanced_parts.any?
-          enhanced_prompt = "#{enhanced_parts.join("\n\n")}\n\nUser question: #{user_content}"
-          user_content = enhanced_prompt
+          system_prompt = "Project Instructions:\n#{project.instructions}\n\nUser question: #{user_content}"
+          user_content = system_prompt
         end
       end
 

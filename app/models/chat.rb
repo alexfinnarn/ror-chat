@@ -103,5 +103,4 @@ class Chat < ApplicationRecord
 
     tool_supporting_ollama_models.any? { |pattern| model_id.match?(pattern) }
   end
-
 end

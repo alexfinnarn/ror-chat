@@ -1,4 +1,5 @@
 require "test_helper"
+require "minitest/mock"
 
 class ChatStreamJobTest < ActiveJob::TestCase
   def setup
@@ -18,7 +19,7 @@ class ChatStreamJobTest < ActiveJob::TestCase
       content: "Ruby is a dynamic programming language. It has elegant syntax and is focused on simplicity and productivity.",
       file_path: "ruby_basics.txt",
       content_type: "text/plain",
-      embedding: [ 0.1, 0.2, 0.3, 0.4, 0.5 ]
+      embedding: Array.new(768, 0.5)  # 768 dimensions for nomic-embed-text model
     )
 
     @doc2 = @project.documents.create!(
@@ -26,109 +27,101 @@ class ChatStreamJobTest < ActiveJob::TestCase
       content: "Rails is a web application framework written in Ruby. It follows the MVC pattern and emphasizes convention over configuration.",
       file_path: "rails_framework.txt",
       content_type: "text/plain",
-      embedding: [ 0.2, 0.3, 0.4, 0.5, 0.6 ]
+      embedding: Array.new(768, 0.6)  # 768 dimensions for nomic-embed-text model
     )
 
     # Create a chat in the project
     @chat = @project.chats.create!(user: @user, model_id: "gpt-3.5-turbo")
   end
 
-  test "should enhance prompt with project instructions and relevant documents" do
+  test "should register document search tool for project chats with tool support" do
     # Create user and assistant messages
     user_message = @chat.messages.create!(role: "user", content: "What is Ruby?")
     assistant_message = @chat.messages.create!(role: "assistant", content: "")
 
-    # Mock DocumentSearchService to return relevant documents
-    relevant_docs = "Document: Ruby Basics\nContent: Ruby is a dynamic programming language. It has elegant syntax and is focused on simplicity and productivity."
-    DocumentSearchService.stub(:search, relevant_docs) do
-      # Mock RubyLLM chat client
-      enhanced_prompt_received = nil
-      mock_client = Minitest::Mock.new
-      mock_client.expect(:add_message, nil, [ Hash ])
-      mock_client.expect(:ask, nil) do |prompt, &block|
-        enhanced_prompt_received = prompt
-        # Simulate streaming response
-        chunk = Struct.new(:content).new("Ruby is a programming language...")
-        yield chunk if block_given?
-      end
+    # Mock chat client to verify tool registration
+    mock_client = Minitest::Mock.new
+    mock_client.expect(:with_tool, nil) do |tool|
+      # Verify WebContentTool is registered
+      tool.is_a?(WebContentTool)
+    end
+    mock_client.expect(:with_tool, nil) do |tool|
+      # Verify DocumentSearchTool is registered
+      tool.is_a?(DocumentSearchTool)
+    end
+    mock_client.expect(:add_message, nil, [ Hash ])
+    mock_client.expect(:ask, nil) do |prompt, &block|
+      # Should be the original user content without automatic enhancement
+      assert_equal "What is Ruby?", prompt
+      chunk = Struct.new(:content).new("Ruby is a programming language...")
+      block.call(chunk) if block
+    end
 
-      RubyLLM.stub(:chat, mock_client) do
+    # Mock supports_tools? to return true
+    @chat.stub(:supports_tools?, true) do
+      RubyLLM.stub :chat, mock_client do
         ChatStreamJob.perform_now(@chat.id)
       end
-
-      # Verify the prompt was enhanced with instructions and documents
-      assert_not_nil enhanced_prompt_received
-      assert_includes enhanced_prompt_received, "Project Instructions:"
-      assert_includes enhanced_prompt_received, "You are a helpful AI assistant specialized in Ruby programming."
-      assert_includes enhanced_prompt_received, "Context from project documents:"
-      assert_includes enhanced_prompt_received, "Ruby is a dynamic programming language"
-      assert_includes enhanced_prompt_received, "User question: What is Ruby?"
-
-      mock_client.verify
     end
+
+    mock_client.verify
   end
 
-  test "should work without project instructions when not provided" do
-    # Create a project without instructions
-    project_without_instructions = Project.create!(
-      name: "No Instructions Project",
-      description: "Project without instructions",
-      user: @user
-    )
+  test "should not register document search tool for chats without project" do
+    # Create a standalone chat (not in a project)
+    standalone_chat = Chat.create!(user: @user, model_id: "gpt-3.5-turbo")
+    user_message = standalone_chat.messages.create!(role: "user", content: "Test question")
+    assistant_message = standalone_chat.messages.create!(role: "assistant", content: "")
 
-    chat = project_without_instructions.chats.create!(user: @user, model_id: "gpt-3.5-turbo")
-    user_message = chat.messages.create!(role: "user", content: "Test question")
-    assistant_message = chat.messages.create!(role: "assistant", content: "")
-
-    # Mock DocumentSearchService to return no documents
-    DocumentSearchService.stub(:search, "") do
-      enhanced_prompt_received = nil
-      mock_client = Minitest::Mock.new
-      mock_client.expect(:add_message, nil, [ Hash ])
-      mock_client.expect(:ask, nil) do |prompt, &block|
-        enhanced_prompt_received = prompt
-        chunk = Struct.new(:content).new("Response...")
-        yield chunk if block_given?
-      end
-
-      RubyLLM.stub(:chat, mock_client) do
-        ChatStreamJob.perform_now(chat.id)
-      end
-
-      # Should just be the original user content without enhancement
-      assert_equal "Test question", enhanced_prompt_received
-
-      mock_client.verify
+    # Mock chat client to verify only WebContentTool is registered
+    mock_client = Minitest::Mock.new
+    mock_client.expect(:with_tool, nil) do |tool|
+      # Only WebContentTool should be registered, not DocumentSearchTool
+      tool.is_a?(WebContentTool)
     end
+    mock_client.expect(:add_message, nil, [ Hash ])
+    mock_client.expect(:ask, nil) do |prompt, &block|
+      assert_equal "Test question", prompt
+      chunk = Struct.new(:content).new("Response...")
+      block.call(chunk) if block
+    end
+
+    # Mock supports_tools? to return true
+    standalone_chat.stub(:supports_tools?, true) do
+      RubyLLM.stub :chat, mock_client do
+        ChatStreamJob.perform_now(standalone_chat.id)
+      end
+    end
+
+    mock_client.verify
   end
 
-  test "should work without relevant documents when none found" do
+  test "should add project instructions for non-tool models" do
     user_message = @chat.messages.create!(role: "user", content: "What is Python?")
     assistant_message = @chat.messages.create!(role: "assistant", content: "")
 
-    # Mock DocumentSearchService to return no relevant documents
-    DocumentSearchService.stub(:search, "") do
-      enhanced_prompt_received = nil
-      mock_client = Minitest::Mock.new
-      mock_client.expect(:add_message, nil, [ Hash ])
-      mock_client.expect(:ask, nil) do |prompt, &block|
-        enhanced_prompt_received = prompt
-        chunk = Struct.new(:content).new("Python is...")
-        yield chunk if block_given?
-      end
+    enhanced_prompt_received = nil
+    mock_client = Minitest::Mock.new
+    mock_client.expect(:add_message, nil, [ Hash ])
+    mock_client.expect(:ask, nil) do |prompt, &block|
+      enhanced_prompt_received = prompt
+      chunk = Struct.new(:content).new("Python is...")
+      block.call(chunk) if block
+    end
 
-      RubyLLM.stub(:chat, mock_client) do
+    # Mock supports_tools? to return false for non-tool models
+    @chat.stub(:supports_tools?, false) do
+      RubyLLM.stub :chat, mock_client do
         ChatStreamJob.perform_now(@chat.id)
       end
-
-      # Should only include project instructions, not document context
-      assert_includes enhanced_prompt_received, "Project Instructions:"
-      assert_includes enhanced_prompt_received, "You are a helpful AI assistant specialized in Ruby programming."
-      assert_not_includes enhanced_prompt_received, "Context from project documents:"
-      assert_includes enhanced_prompt_received, "User question: What is Python?"
-
-      mock_client.verify
     end
+
+    # Should include project instructions as system context for non-tool models
+    assert_includes enhanced_prompt_received, "Project Instructions:"
+    assert_includes enhanced_prompt_received, "You are a helpful AI assistant specialized in Ruby programming."
+    assert_includes enhanced_prompt_received, "User question: What is Python?"
+
+    mock_client.verify
   end
 
   test "should not enhance prompt for chats without project" do
@@ -143,10 +136,10 @@ class ChatStreamJobTest < ActiveJob::TestCase
     mock_client.expect(:ask, nil) do |prompt, &block|
       enhanced_prompt_received = prompt
       chunk = Struct.new(:content).new("Hello there!")
-      yield chunk if block_given?
+      block.call(chunk) if block
     end
 
-    RubyLLM.stub(:chat, mock_client) do
+    RubyLLM.stub :chat, mock_client do
       ChatStreamJob.perform_now(standalone_chat.id)
     end
 
@@ -156,34 +149,29 @@ class ChatStreamJobTest < ActiveJob::TestCase
     mock_client.verify
   end
 
-  test "should call DocumentSearchService with correct parameters" do
+  test "document search tool can access current chat context" do
+    # Create user and assistant messages
     user_message = @chat.messages.create!(role: "user", content: "How do I create a Rails app?")
     assistant_message = @chat.messages.create!(role: "assistant", content: "")
 
-    # Mock DocumentSearchService to verify it's called correctly
-    search_called_with = nil
-    DocumentSearchService.stub(:search, ->(query, **options) {
-      search_called_with = { query: query, options: options }
-      "Mock document results"
-    }) do
-      mock_client = Minitest::Mock.new
-      mock_client.expect(:add_message, nil, [ Hash ])
-      mock_client.expect(:ask, nil) do |prompt, &block|
-        chunk = Struct.new(:content).new("To create a Rails app...")
-        yield chunk if block_given?
-      end
+    # Create a document search tool and verify it can access chat context
+    tool = DocumentSearchTool.new
 
-      RubyLLM.stub(:chat, mock_client) do
-        ChatStreamJob.perform_now(@chat.id)
-      end
+    # Mock the tool's context to simulate being called within a chat
+    mock_context = Minitest::Mock.new
+    mock_context.expect(:chat, @chat)
 
-      mock_client.verify
+    tool.stub(:context, mock_context) do
+      # Mock DocumentSearchService
+      DocumentSearchService.stub(:search, [ "Mock search results" ]) do
+        result = tool.execute(query: "test query")
+
+        assert_includes result, "Found 1 relevant document(s)"
+        assert_includes result, "Mock search results"
+      end
     end
 
-    # Verify DocumentSearchService was called with correct parameters
-    assert_not_nil search_called_with
-    assert_equal "How do I create a Rails app?", search_called_with[:query]
-    assert_equal @project.id, search_called_with[:options][:project_id]
+    mock_context.verify
   end
 
   test "should handle errors gracefully" do
@@ -191,7 +179,7 @@ class ChatStreamJobTest < ActiveJob::TestCase
     assistant_message = @chat.messages.create!(role: "assistant", content: "")
 
     # Mock RubyLLM.chat to raise an error
-    RubyLLM.stub(:chat, ->(_) { raise "API Error" }) do
+    RubyLLM.stub :chat, ->(_) { raise "API Error" } do
       ChatStreamJob.perform_now(@chat.id)
     end
 

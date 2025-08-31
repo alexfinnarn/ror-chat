@@ -53,7 +53,8 @@ class DocumentsController < ApplicationController
           title: uploaded_file.original_filename,
           content: content,
           file_path: uploaded_file.original_filename,
-          content_type: uploaded_file.content_type
+          content_type: uploaded_file.content_type,
+          summary: params[:summary].presence
         )
 
         if @document.save
@@ -100,7 +101,7 @@ class DocumentsController < ApplicationController
     @document.destroy
     respond_to do |format|
       format.html { redirect_to @project, notice: "Document deleted successfully." }
-      format.js { render "destroy" }
+      format.turbo_stream { render turbo_stream: turbo_stream.remove(@document) }
     end
   end
 
